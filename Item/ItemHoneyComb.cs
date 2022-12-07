@@ -114,20 +114,32 @@ namespace Vintagestory.GameContent
 
         public override void OnHeldInteractStop(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
         {
-            if (blockSel == null) return base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel);
-            if (secondsUsed < 1.9f) return base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel);
-
+            if (blockSel == null || secondsUsed < 1.9f)
+            {
+                base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel);
+                return;
+            }
+            
             IWorldAccessor world = byEntity.World;
 
             Block block = byEntity.World.BlockAccessor.GetBlock(blockSel.Position);
-            if (!CanSqueezeInto(block, blockSel.Position)) return base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel);
+
+            if (!CanSqueezeInto(block, blockSel.Position))
+            {
+                base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel);
+                return;
+            }
 
             ItemStack honeyStack = new ItemStack(world.GetItem(new AssetLocation("honeyportion")), 99999);
 
             BlockLiquidContainerTopOpened blockCnt = block as BlockLiquidContainerTopOpened;
             if (blockCnt != null)
             {
-                if (blockCnt.TryPutLiquid(blockSel.Position, honeyStack, ContainedHoneyLitres) == 0) return base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel);
+                if (blockCnt.TryPutLiquid(blockSel.Position, honeyStack, ContainedHoneyLitres) == 0)
+                {
+                    base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel);
+                    return;
+                }
             }
             else
             {
