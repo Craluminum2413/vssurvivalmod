@@ -11,6 +11,8 @@ namespace Vintagestory.GameContent
 
     public class BlockEntityBed : BlockEntity, IMountableSeat, IMountable
     {
+        long restingListener;
+
         static Vec3f eyePos = new Vec3f(0, 0.3f, 0);
 
         float sleepEfficiency = 0.5f;
@@ -190,7 +192,7 @@ namespace Vintagestory.GameContent
             mountedByEntityId = 0;
             mountedByPlayerUid = null;
 
-            base.OnBlockRemoved();
+            Api.Event.UnregisterGameTickListener(restingListener);
         }
 
         public void DidMount(EntityAgent entityAgent)
@@ -213,7 +215,7 @@ namespace Vintagestory.GameContent
 
             if (Api?.Side == EnumAppSide.Server)
             {
-                RegisterGameTickListener(RestPlayer, 200);
+                restingListener = RegisterGameTickListener(RestPlayer, 200);
                 hoursTotal = Api.World.Calendar.TotalHours;
             }
 
